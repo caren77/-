@@ -4,8 +4,8 @@ import time
 import os
 
 # --- 配置区 ---
-TARGET_URL = "https://faculty.ustc.edu.cn/flowice/zh_CN/zdylm/679092/list/index.htm"
-SEND_KEY = "SCT321833TVQAhHdGtvIrWsrPBv2JHYnma" 
+TARGET_URL = "https://faculty.ustc.edu.cn/flowice/zh_CN/zdylm/679092/list/index.htm  #老师主页
+SEND_KEY = "输入你自己的send-key" 
 CHECK_INTERVAL = 3600  # 每小时检查一次
 LAST_CONTENT_FILE = "last_hw_slice.txt"
 
