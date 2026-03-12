@@ -27,5 +27,14 @@ jobs:
         run: ls -R  # 这行会在日志里列出所有文件，方便我们debug
 
       - name: Run spider
-        # 【重要】如果你的文件在 python 文件夹里，请把下面这行改为 python python/homeworkbug.py
-        run: python homeworkbug.py
+        # 用这个命令，它会自动在所有文件夹里找 homeworkbug.py 并运行
+        run: |
+          FILE_PATH=$(find . -name "homeworkbug.py" | head -n 1)
+          if [ -z "$FILE_PATH" ]; then
+            echo "错误：在仓库里根本没找到 homeworkbug.py"
+            ls -R
+            exit 1
+          else
+            echo "找到文件：$FILE_PATH"
+            python "$FILE_PATH"
+          fi
