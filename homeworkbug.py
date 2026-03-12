@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import time
 import os
 
-# --- 配置区 ---
 TARGET_URL = "https://faculty.ustc.edu.cn/flowice/zh_CN/zdylm/679092/list/index.htm"
 SEND_KEY = "SCT321833TVQAhHdGtvIrWsrPBv2JHYnma" 
 CHECK_INTERVAL = 3600  # 每小时检查一次
