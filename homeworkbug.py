@@ -4,7 +4,7 @@ import time
 import os
 
 TARGET_URL = "https://faculty.ustc.edu.cn/flowice/zh_CN/zdylm/679092/list/index.htm"
-SEND_KEY = "SCT321833TVQAhHdGtvIrWsrPBv2JHYnma" 
+SEND_KEY = os.environ.get("SERVER_CHAN_KEY") 
 CHECK_INTERVAL = 3600  # 每小时检查一次
 LAST_CONTENT_FILE = "last_hw_slice.txt"
 
