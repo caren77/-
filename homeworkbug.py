@@ -59,38 +59,22 @@ def get_homework_slice():
     return None
 
 def monitor():
-    print("="*30)
-    print(f"🔍 正在监控：[{TARGET_URL}]")
-    print("🎯 目标区域：'作业布置' 与 '重要通知' 之间")
-    print("="*30)
-
-    while True:
-        current_hw = get_homework_slice()
+    print(f"🔍 正在检查更新：{time.strftime('%Y-%m-%d %H:%M:%S')}")
+    current_hw = get_homework_slice()
+    
+    if current_hw:
+        last_hw = ""
+        if os.path.exists(LAST_CONTENT_FILE):
+            with open(LAST_CONTENT_FILE, "r", encoding="utf-8") as f:
+                last_hw = f.read()
         
-        if current_hw:
-            # 读取旧记录
-            last_hw = ""
-            if os.path.exists(LAST_CONTENT_FILE):
-                with open(LAST_CONTENT_FILE, "r", encoding="utf-8") as f:
-                    last_hw = f.read()
-            
-            # 对比内容
-            if current_hw != last_hw:
-                print(f"\n✨ 【内容更新】 {time.strftime('%Y-%m-%d %H:%M:%S')}")
-                print("-" * 20)
-                print(current_hw)
-                print("-" * 20)
-                
-                # 推送微信
-                send_wechat_notification("作业板块有更新！", f"最新内容：\n{current_hw}")
-                
-                # 更新本地文件
-                with open(LAST_CONTENT_FILE, "w", encoding="utf-8") as f:
-                    f.write(current_hw)
-            else:
-                print(f"\r🕒 轮询中... 上次检查: {time.strftime('%H:%M:%S')} (未发现更新)", end="")
-        
-        time.sleep(CHECK_INTERVAL)
+        if current_hw != last_hw:
+            print("✨ 发现更新，正在推送...")
+            send_wechat_notification("作业有更新！", current_hw)
+            with open(LAST_CONTENT_FILE, "w", encoding="utf-8") as f:
+                f.write(current_hw)
+        else:
+            print("🕒 内容无变化。")
 
 if __name__ == "__main__":
-    monitor()
+    monitor() # 只跑一次，剩下的交给 GitHub 每 24 小时唤醒一次
