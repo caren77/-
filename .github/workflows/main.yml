@@ -2,39 +2,53 @@ name: Daily Spider
 
 on:
   schedule:
+    # 每天凌晨 0 点运行（UTC 时间，北京时间 8 点）
     - cron: '0 0 * * *'
+  # 支持手动点击运行
   workflow_dispatch:
+
+# 必须增加权限，否则无法将更新后的 txt 提交回仓库
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # 解决了 Node.js 20 的警告
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # 解决了 Node.js 20 的警告
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # 自动安装爬虫需要的库，如果你有别的库，请在后面加上空格继续写
-          pip install requests beautifulsoup4 pandas 
-
-      - name: Check Directory
-        run: ls -R  # 这行会在日志里列出所有文件，方便我们debug
+          pip install requests beautifulsoup4 pandas
 
       - name: Run spider
-        # 用这个命令，它会自动在所有文件夹里找 homeworkbug.py 并运行
+        env:
+          # 【重要】在这里映射你的 Secret
+          SERVER_CHAN_KEY: ${{ secrets.SERVER_CHAN_KEY }}
         run: |
           FILE_PATH=$(find . -name "homeworkbug.py" | head -n 1)
           if [ -z "$FILE_PATH" ]; then
-            echo "错误：在仓库里根本没找到 homeworkbug.py"
-            ls -R
+            echo "错误：找不到 homeworkbug.py"
             exit 1
           else
-            echo "找到文件：$FILE_PATH"
+            echo "正在运行：$FILE_PATH"
             python "$FILE_PATH"
+          fi
+
+      - name: Save Cache (Commit and push)
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          # 检查是否有内容变化
+          if [ -f "last_hw_slice.txt" ]; then
+            git add last_hw_slice.txt
+            git commit -m "Update homework cache [skip ci]" || echo "无内容变化"
+            git push
           fi
