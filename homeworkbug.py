@@ -9,13 +9,21 @@ CHECK_INTERVAL = 3600  # 每小时检查一次
 LAST_CONTENT_FILE = "last_hw_slice.txt"
 
 def send_wechat_notification(title, content):
-    """Server酱微信推送"""
+    if not SEND_KEY:
+        print("❌ 错误：SEND_KEY 为空，请检查环境变量！")
+        return
+
     url = f"https://sctapi.ftqq.com/{SEND_KEY}.send"
     data = {"title": title, "desp": content}
     try:
-        requests.post(url, data=data, timeout=10)
-    except:
-        print("推送失败")
+        response = requests.post(url, data=data, timeout=10)
+        result = response.json()
+        if result.get("code") == 0:
+            print("✅ 微信推送成功")
+        else:
+            print(f"❌ 推送失败，Server酱返回：{result.get('message')}")
+    except Exception as e:
+        print(f"❌ 网络请求异常: {e}")
 
 def get_homework_slice():
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
